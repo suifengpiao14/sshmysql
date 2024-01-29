@@ -1,6 +1,7 @@
 package sshmysql_test
 
 import (
+	"database/sql"
 	"fmt"
 	"testing"
 
@@ -8,20 +9,34 @@ import (
 	"github.com/suifengpiao14/sshmysql"
 )
 
-func TestSshMysql(t *testing.T) {
-	sshConfig := sshmysql.SSHConfig{
-		Address:  "ip:port",
-		User:     "username",
-		Password: "",
-	}
-	dbDSN := "user:password@tcp(127.0.0.1:3306)/ad?charset=utf8&timeout=1s&readTimeout=5s&writeTimeout=5s&parseTime=False&loc=Local&multiStatements=true"
+var sshConfig = sshmysql.SSHConfig{
+	Address:        "120.24.156.100:2221",
+	User:           "root",
+	PriviteKeyFile: "C:\\Users\\Admin\\.ssh\\id_rsa",
+}
+var dbDSN = `root:1b03f8b486908bbe34ca2f4a4b91bd1c@tcp(127.0.0.1:3306)/curdservice?charset=utf8&timeout=5s&readTimeout=5s&writeTimeout=5s&parseTime=False&loc=Local&multiStatements=true`
 
+func TestSshMysql(t *testing.T) {
 	db, err := sshConfig.Tunnel(dbDSN)
 	require.NoError(t, err)
-	sql := "select count(*) from ad.advertise;"
+	sql := "select count(*) from service where 1=1;"
+	var out int64
+	err = db.QueryRow(sql).Scan(&out)
+	require.NoError(t, err)
+	fmt.Println(out)
+
+}
+
+func TestInitSSHmysql(t *testing.T) {
+	err := sshConfig.RegisterNetwork(dbDSN)
+	require.NoError(t, err)
+	db, err := sql.Open("mysql", dbDSN)
+	require.NoError(t, err)
+
+	sqlStr := "select count(*) from service where 1=1;"
 	var count int64
-	err = db.QueryRow(sql).Scan(&count)
+	sqlRaw := db.QueryRow(sqlStr)
+	err = sqlRaw.Scan(&count)
 	require.NoError(t, err)
 	fmt.Println(count)
-
 }
