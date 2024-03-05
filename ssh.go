@@ -3,6 +3,7 @@ package sshmysql
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"net"
 	"os"
 
@@ -14,10 +15,20 @@ import (
 )
 
 type SSHConfig struct {
-	Address        string
-	User           string
-	Password       string
-	PriviteKeyFile string
+	Address        string `json:"address"`
+	User           string `json:"user"`
+	Password       string `json:"password"`
+	PriviteKeyFile string `json:"priviteKeyFile"`
+}
+
+//JsonToSSHConfig 将json字符串转为SSHConfig对象
+func JsonToSSHConfig(s string) (sshConfig *SSHConfig, err error) {
+	sshConfig = &SSHConfig{}
+	err = json.Unmarshal([]byte(s), sshConfig)
+	if err != nil {
+		return nil, err
+	}
+	return sshConfig, nil
 }
 
 func (h SSHConfig) Config() (cfg *ssh.ClientConfig, err error) {
