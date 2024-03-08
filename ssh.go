@@ -22,10 +22,12 @@ type SSHConfig struct {
 	PriviteKeyFile string `json:"priviteKeyFile"`
 }
 
+var ERROR_EMPTY_CONFIG = errors.New("empty ssh config")
+
 //JsonToSSHConfig 将json字符串转为SSHConfig对象
 func JsonToSSHConfig(s string) (sshConfig *SSHConfig, err error) {
 	if strings.TrimSpace(s) == "" {
-		return nil, nil
+		return nil, ERROR_EMPTY_CONFIG
 	}
 	sshConfig = &SSHConfig{}
 	err = json.Unmarshal([]byte(s), sshConfig)
