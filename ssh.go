@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net"
 	"os"
+	"strings"
 
 	mysqlD "github.com/go-sql-driver/mysql"
 	"github.com/jfcote87/sshdb"
@@ -23,6 +24,9 @@ type SSHConfig struct {
 
 //JsonToSSHConfig 将json字符串转为SSHConfig对象
 func JsonToSSHConfig(s string) (sshConfig *SSHConfig, err error) {
+	if strings.TrimSpace(s) == "" {
+		return nil, nil
+	}
 	sshConfig = &SSHConfig{}
 	err = json.Unmarshal([]byte(s), sshConfig)
 	if err != nil {
