@@ -10,11 +10,11 @@ import (
 )
 
 var sshConfig = sshmysql.SSHConfig{
-	Address:        "120.24.156.100:2221",
-	User:           "root",
-	PriviteKeyFile: "C:\\Users\\Admin\\.ssh\\id_rsa",
+	Address:        "ip:port",
+	User:           "user",
+	PriviteKeyFile: "id_rsa",
 }
-var dbDSN = `root:1b03f8b486908bbe34ca2f4a4b91bd1c@tcp(127.0.0.1:3306)/curdservice?charset=utf8&timeout=5s&readTimeout=5s&writeTimeout=5s&parseTime=False&loc=Local&multiStatements=true`
+var dbDSN = `user:password@tcp(127.0.0.1:3306)/db?charset=utf8&timeout=5s&readTimeout=5s&writeTimeout=5s&parseTime=False&loc=Local&multiStatements=true`
 
 func TestSshMysql(t *testing.T) {
 	db, err := sshConfig.Tunnel(dbDSN)
