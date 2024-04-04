@@ -12,7 +12,7 @@ import (
 var sshConfig = sshmysql.SSHConfig{
 	Address:        "ip:port",
 	User:           "user",
-	PriviteKeyFile: "id_rsa",
+	PrivateKeyFile: "id_rsa",
 }
 var dbDSN = `user:password@tcp(127.0.0.1:3306)/db?charset=utf8&timeout=5s&readTimeout=5s&writeTimeout=5s&parseTime=False&loc=Local&multiStatements=true`
 
