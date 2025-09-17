@@ -24,7 +24,7 @@ type SSHConfig struct {
 
 var ERROR_EMPTY_CONFIG = errors.New("empty ssh config")
 
-//JsonToSSHConfig 将json字符串转为SSHConfig对象
+// JsonToSSHConfig 将json字符串转为SSHConfig对象
 func JsonToSSHConfig(s string) (sshConfig *SSHConfig, err error) {
 	if strings.TrimSpace(s) == "" {
 		return nil, ERROR_EMPTY_CONFIG
@@ -37,7 +37,7 @@ func JsonToSSHConfig(s string) (sshConfig *SSHConfig, err error) {
 	return sshConfig, nil
 }
 
-func (h SSHConfig) Config() (cfg *ssh.ClientConfig, err error) {
+func (h SSHConfig) sshConfig() (cfg *ssh.ClientConfig, err error) {
 	cfg = &ssh.ClientConfig{
 		User:            h.User,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
@@ -63,8 +63,9 @@ func (h SSHConfig) Config() (cfg *ssh.ClientConfig, err error) {
 	return cfg, nil
 }
 
+// Deprecated use h.RegisterSSHNet 代替
 func (h SSHConfig) Tunnel(dsn string) (sqlDB *sql.DB, err error) {
-	sshConfig, err := h.Config()
+	sshConfig, err := h.sshConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -82,9 +83,9 @@ func (h SSHConfig) Tunnel(dsn string) (sqlDB *sql.DB, err error) {
 	return sqlDB, err
 }
 
-//RegisterNetwork 注册自定义网络协议,比 Tunnel 更能和其它已有项目兼容
+// Deprecated  use h.RegisterSSHNet 代替
 func (h SSHConfig) RegisterNetwork(dsn string) (err error) {
-	sshConfig, err := h.Config()
+	sshConfig, err := h.sshConfig()
 	if err != nil {
 		return err
 	}
@@ -108,5 +109,27 @@ func (h SSHConfig) RegisterNetwork(dsn string) (err error) {
 		return tunnel.DialContext(ctx, cfg.Net, addr)
 	})
 
+	return nil
+}
+
+const (
+	SSH_NET = "ssh"
+)
+
+// RegisterSSHNet 注册自定义网络，用于sql.Open("mysql", dsn)中使用ssh隧道连接数据库
+func (h SSHConfig) RegisterSSHNet() (err error) {
+	sshConfig, err := h.sshConfig()
+	if err != nil {
+		return err
+	}
+	tunnel, err := sshdb.New(sshConfig, h.Address)
+	if err != nil {
+		return err
+	}
+	tunnel.IgnoreSetDeadlineRequest(true)
+	//注册自定义网络
+	mysqlD.RegisterDialContext(SSH_NET, func(ctx context.Context, addr string) (net.Conn, error) {
+		return tunnel.DialContext(ctx, SSH_NET, addr)
+	})
 	return nil
 }
