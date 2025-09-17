@@ -19,7 +19,7 @@ type SSHConfig struct {
 	Address        string `json:"address"`
 	User           string `json:"user"`
 	Password       string `json:"password"`
-	PriviteKeyFile string `json:"priviteKeyFile"`
+	PrivateKeyFile string `json:"privateKeyFile"`
 }
 
 var ERROR_EMPTY_CONFIG = errors.New("empty ssh config")
@@ -47,11 +47,11 @@ func (h SSHConfig) sshConfig() (cfg *ssh.ClientConfig, err error) {
 		cfg.Auth = append(cfg.Auth, ssh.Password(h.Password))
 		return cfg, nil
 	}
-	if h.PriviteKeyFile == "" {
+	if h.PrivateKeyFile == "" {
 		return cfg, nil
 	}
 	//优先使用keyFile
-	k, err := os.ReadFile(h.PriviteKeyFile)
+	k, err := os.ReadFile(h.PrivateKeyFile)
 	if err != nil {
 		return nil, err
 	}
