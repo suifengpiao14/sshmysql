@@ -2,7 +2,6 @@ package sshmysql
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"net"
 	"os"
@@ -61,26 +60,6 @@ func (h SSHConfig) sshConfig() (cfg *ssh.ClientConfig, err error) {
 	}
 	cfg.Auth = append(cfg.Auth, ssh.PublicKeys(signer))
 	return cfg, nil
-}
-
-// Deprecated use h.RegisterSSHNet 代替
-func (h SSHConfig) Tunnel(dsn string) (sqlDB *sql.DB, err error) {
-	sshConfig, err := h.sshConfig()
-	if err != nil {
-		return nil, err
-	}
-	tunnel, err := sshdb.New(sshConfig, h.Address)
-	if err != nil {
-		return nil, err
-	}
-	tunnel.IgnoreSetDeadlineRequest(true)
-	connector, err := tunnel.OpenConnector(mysql.TunnelDriver, dsn)
-	if err != nil {
-		err = errors.WithMessagef(err, " dsn:%s", dsn)
-		return nil, err
-	}
-	sqlDB = sql.OpenDB(connector)
-	return sqlDB, err
 }
 
 // Deprecated  use h.RegisterSSHNet 代替
