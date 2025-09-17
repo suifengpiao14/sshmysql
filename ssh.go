@@ -62,7 +62,6 @@ func (h SSHConfig) sshConfig() (cfg *ssh.ClientConfig, err error) {
 	return cfg, nil
 }
 
-// Deprecated  use h.RegisterSSHNet 代替
 func (h SSHConfig) RegisterNetwork(dsn string) (err error) {
 	sshConfig, err := h.sshConfig()
 	if err != nil {
