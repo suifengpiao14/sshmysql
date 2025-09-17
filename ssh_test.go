@@ -10,14 +10,14 @@ import (
 )
 
 var sshConfig = sshmysql.SSHConfig{
-	Address:        "127.0.0.1:22",
+	Address:        "ip:port",
 	User:           "root",
 	PrivateKeyFile: "C:\\Users\\Admin\\.ssh\\id_rsa",
 }
-var dbDSN = `root:1b03f8b486908bbe34ca2f4a4b91bd1c@ssh(127.0.0.1:3306)/test?charset=utf8&timeout=5s&readTimeout=5s&writeTimeout=5s&parseTime=False&loc=Local&multiStatements=true`
+var dbDSN = `root:1b03f8b486908bbe34ca2f4a4b91bd1c@tcp(127.0.0.1:3306)/test?charset=utf8&timeout=5s&readTimeout=5s&writeTimeout=5s&parseTime=False&loc=Local&multiStatements=true`
 
 func TestRegisterSSHNet(t *testing.T) {
-	err := sshConfig.RegisterSSHNet()
+	err := sshConfig.RegisterNetwork(dbDSN)
 	require.NoError(t, err)
 	db, err := sql.Open("mysql", dbDSN)
 	require.NoError(t, err)

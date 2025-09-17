@@ -111,25 +111,3 @@ func (h SSHConfig) RegisterNetwork(dsn string) (err error) {
 
 	return nil
 }
-
-const (
-	SSH_NET = "ssh"
-)
-
-// RegisterSSHNet 注册自定义网络，用于sql.Open("mysql", dsn)中使用ssh隧道连接数据库
-func (h SSHConfig) RegisterSSHNet() (err error) {
-	sshConfig, err := h.sshConfig()
-	if err != nil {
-		return err
-	}
-	tunnel, err := sshdb.New(sshConfig, h.Address)
-	if err != nil {
-		return err
-	}
-	tunnel.IgnoreSetDeadlineRequest(true)
-	//注册自定义网络
-	mysqlD.RegisterDialContext(SSH_NET, func(ctx context.Context, addr string) (net.Conn, error) {
-		return tunnel.DialContext(ctx, SSH_NET, addr)
-	})
-	return nil
-}
